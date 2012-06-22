@@ -1,0 +1,36 @@
+GCC = /usr/bin/gcc-4.2
+GPP = g++
+LD = g++
+
+SONAME=curl
+
+DEP=curl-7.21.6
+
+DEP_ARCHIVE=curl_7.21.6.orig.tar.gz
+
+OBJ=$(SONAME).o
+
+V8LIB_DIR=/usr/local/silkjs/src/v8
+
+V8LIB_DIR=/usr/local/silkjs/src/v8
+
+V8=	$(V8LIB_DIR)/libv8_base.a $(V8LIB_DIR)/libv8_snapshot.a
+
+CCFLAGS=-fPIC -I/usr/local/silkjs/src -I$(V8LIB_DIR)/include -I$(DEP)/include
+
+.cpp.o:
+	$(GPP) -c $(CCFLAGS) -o $*.o $*.cpp
+
+all:	$(DEP) $(OBJ)
+	$(LD) -shared -Wl,-install_name,$(SONAME)_module.so -o $(SONAME)_module.so $(OBJ) $(DEP)/lib/.libs/libcurl.a -L$(V8LIB_DIR) -lv8 -lssl -lsasl2 -lcrypto -lldap -lz
+
+clean:
+	@rm src/*.o
+
+realclean:
+	@rm -rf src/*.o $(DEP)
+
+$(DEP):
+	tar xzvfp $(DEP_ARCHIVE)
+	cd $(DEP) && ./configure && make
+
